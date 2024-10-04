@@ -68,10 +68,9 @@ or:
 
     > sudo ./dfu.py -z ~/application.zip -a CD:E3:4A:47:1C:E4
 
-You can use the `hcitool lescan` to figure out the address of a DFU target, for example:
+You can use `scan.py` to figure out the address of a DFU target, for example:
 
-    $ sudo hcitool -i hci0 lescan
-    LE Scan ...
+    $ python3 scan.py
     CD:E3:4A:47:1C:E4 <TARGET_NAME>
     CD:E3:4A:47:1C:E4 (unknown)
 
