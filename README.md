@@ -1,19 +1,13 @@
 # Python nRF5 OTA DFU Controller
 
-So... this is my fork of dingara's fork of astronomer80's fork of
+This is a fork of the wasp-os fork of dingara's fork of astronomer80's fork of
 foldedtoad's Python OTA DFU utility. 
 
-My own contribution is little more than a brute force conversion to 
-python3. It is sparsely tested so there are likely to be a few 
-remaining bytes versus string bugs remaining in the places I didn't test
-. I used it primarily as part of
-[wasp-os](https://github.com/wasp-os/wasp-os) as a way to
-deliver OTA updates to nRF52-based smart watches, especially the
-[Pine64 PineTime](https://www.pine64.org/pinetime/).
+I plan to update this to use bleak for cross-platform support.
 
 ## What does it do?
 
-This is a Python program that uses `gatttool` (provided with the Linux BlueZ driver) to achieve Over The Air (OTA) Device Firmware Updates (DFU) to a Nordic Semiconductor nRF5 (either nRF51 or nRF52) device via Bluetooth Low Energy (BLE).
+This is a Python program that uses [bleak](https://github.com/hbldh/bleak) to achieve Over The Air (OTA) Device Firmware Updates (DFU) to a Nordic Semiconductor nRF5 (either nRF51 or nRF52) device via Bluetooth Low Energy (BLE).
 
 ### Main features:
 
@@ -25,10 +19,16 @@ Before using this utility the nRF5 peripheral device needs to be programmed with
 
 ## Prerequisites
 
-* BlueZ 5.4 or above
-* Python 3.6
-* Python `pexpect` module (available via pip)
-* Python `intelhex` module (available via pip)
+* Python 3.6 or above
+* The Python packages listed in `requirements.txt` (available via pip)
+
+## Installing dependencies (using a Python virtual environment)
+
+```
+python3 -m venv .venv 
+.venv/bin/pip3 install requirements.txt
+.venv/bin/pip3 install -r requirements.txt
+```
 
 ## Firmware Build Requirement
 
