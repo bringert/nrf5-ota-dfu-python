@@ -8,6 +8,11 @@ from util  import *
 
 verbose = False
 
+# the exchanges will be logged to allow looking back for answers
+# by the device that we missed
+import tempfile
+backlogger = tempfile.NamedTemporaryFile("wb")
+
 class NrfBleDfuController(object, metaclass=ABCMeta):
     ctrlpt_handle        = 0
     ctrlpt_cccd_handle   = 0
@@ -58,7 +63,7 @@ class NrfBleDfuController(object, metaclass=ABCMeta):
         self.firmware_path = firmware_path
         self.datfile_path = datfile_path
 
-        self.ble_conn = pexpect.spawn("gatttool -b '%s' -t random --interactive" % target_mac)
+        self.ble_conn = pexpect.spawn("gatttool -b '%s' -t random --interactive" % target_mac, logfile=backlogger)
         self.ble_conn.delaybeforesend = 0
 
     # --------------------------------------------------------------------------
@@ -149,7 +154,7 @@ class NrfBleDfuController(object, metaclass=ABCMeta):
 
         # Re-start gatttool with the new address
         self.disconnect()
-        self.ble_conn = pexpect.spawn("gatttool -b '%s' -t random --interactive" % self.target_mac)
+        self.ble_conn = pexpect.spawn("gatttool -b '%s' -t random --interactive" % self.target_mac, logfile=backlogger)
         self.ble_conn.delaybeforesend = 0
 
     # --------------------------------------------------------------------------
@@ -182,6 +187,7 @@ class NrfBleDfuController(object, metaclass=ABCMeta):
                 print("connection not alive")
                 return None
 
+            before = self.ble_conn.after
             try:
                 index = self.ble_conn.expect('Notification handle = .*? \r\n', timeout=30)
 
@@ -198,10 +204,24 @@ class NrfBleDfuController(object, metaclass=ABCMeta):
                 #
                 self.ble_conn.sendline('')
                 string = self.ble_conn.before
-                if '[   ]' in string:
+                if b'[   ]' in string:
                     print('Connection lost! ')
                     raise Exception('Connection Lost')
-                return None
+                else:
+                    # the notification might have been sent a bit too
+                    # early, reading the log to make sure:
+                    with open(backlogger.name, "rb") as f:
+                        content = f.read()
+                    if not b"Notification handle = " in content:
+                        # no notification received
+                        return None
+                    else:
+                        # trim the latest message until the notification
+                        while not before.startswith(b"Notification handle ="):
+                            before = before[1:]
+                        hxstr = before.split()[3:]
+                        handle = int(float.fromhex(hxstr[0].decode('UTF-8')))
+                        return hxstr[2:]
 
             if index == 0:
                 after = self.ble_conn.after

@@ -71,7 +71,9 @@ def main():
         parser.add_option('-v', '--verbose',
                   action='store_true',
                   dest='verbose',
-                  help='Enable verbose mode'
+                  help=('Increase verbosity. (You can increase verbosity '
+                      'further by manually setting verbose=True at the top '
+                      'of the other .py files.')
                   )
         options, args = parser.parse_args()
 
