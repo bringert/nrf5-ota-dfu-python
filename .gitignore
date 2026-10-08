@@ -1,3 +1,5 @@
 *.pyc
 *.sublime*
-.venv/
+.venv/*.zip
+dfu.log
+__pycache__/

@@ -2,6 +2,8 @@ import os
 import pexpect
 import re
 
+from intelhex import IntelHex
+
 from abc   import ABCMeta, abstractmethod
 from array import array
 from util  import *
@@ -123,13 +125,13 @@ class NrfBleDfuController(object, metaclass=ABCMeta):
     # Perform a scan and connect via gatttool.
     # Will return True if a connection was established, False otherwise
     # --------------------------------------------------------------------------
-    def scan_and_connect(self, timeout=2):
+    def scan_and_connect(self, timeout=5):
         if verbose: print("scan_and_connect")
 
         print("Connecting to %s" % (self.target_mac))
 
         try:
-            self.ble_conn.expect('\[LE\]>', timeout=timeout)
+            self.ble_conn.expect(r'\[LE\]>', timeout=timeout)
         except pexpect.TIMEOUT as e:
             return False
 
@@ -167,7 +169,7 @@ class NrfBleDfuController(object, metaclass=ABCMeta):
         self.ble_conn.sendline('characteristics')
 
         try:
-            self.ble_conn.expect([uuid], timeout=2)
+            self.ble_conn.expect([uuid], timeout=10)
             handles = re.findall(b'.*handle: (0x....),.*char value handle: (0x....)', self.ble_conn.before)
             (handle, value_handle) = handles[-1]
         except pexpect.TIMEOUT as e:
