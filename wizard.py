@@ -15,7 +15,7 @@ import tkinter.filedialog
 from tkinter.filedialog import askopenfilename
 
 from scan import Scan
-from dfu2 import *
+from dfu import *
 
 #------------------------------------------------------------------------------
 #

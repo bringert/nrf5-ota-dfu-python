@@ -31,8 +31,8 @@ class Unpacker(object):
 
         with zipfile.ZipFile(file, 'r') as zip:
             files = [item.filename for item in zip.infolist()]
-            datfilename = [m.group(0) for f in files for m in [re.search('.*\.dat', f)] if m].pop()
-            binfilename = [m.group(0) for f in files for m in [re.search('.*\.bin', f)] if m].pop()
+            datfilename = [m.group(0) for f in files for m in [re.search(r'.*\.dat', f)] if m].pop()
+            binfilename = [m.group(0) for f in files for m in [re.search(r'.*\.bin', f)] if m].pop()
 
             zip.extractall(r'{0}'.format(self.unzip_dir))
 

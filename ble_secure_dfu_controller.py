@@ -255,10 +255,10 @@ class BleDfuControllerSecure(NrfBleDfuController):
         time_start = time.time()
         last_send_time = time.time()
 
-        obj_offset = (offset/max_size)*max_size
+        obj_offset = (offset // max_size) * max_size
         while(obj_offset < self.image_size):
             # print "\nSending object {} of {}".format(obj_offset/max_size+1, num_objects)
-            obj_offset += self._dfu_send_object(obj_offset, max_size)
+            obj_offset += self._dfu_send_object(obj_offset, max_size, crc32)
 
         # Image uploaded successfully, update the progress bar
         print_progress(self.image_size, self.image_size, barLength = 50)
@@ -269,7 +269,7 @@ class BleDfuControllerSecure(NrfBleDfuController):
     # --------------------------------------------------------------------------
     #  Send a single data object of given size and offset.
     # --------------------------------------------------------------------------
-    def _dfu_send_object(self, offset, obj_max_size):
+    def _dfu_send_object(self, offset, obj_max_size, crc32=0):
         if offset != self.image_size:
             if offset == 0 or offset >= obj_max_size or crc32 != crc32_unsigned(self.bin_array[0:offset]):
                 # Create Data Object
@@ -295,7 +295,7 @@ class BleDfuControllerSecure(NrfBleDfuController):
                 if (segment_count % self.pkt_receipt_interval) == 0:
                     try:
                         (proc, res, offset, crc32) = self._wait_and_parse_notify()
-                    except e:
+                    except Exception:
                         # Likely no notification received, need to re-transmit object
                         return 0
 
